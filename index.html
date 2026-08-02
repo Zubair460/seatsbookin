@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.css" integrity="sha512-kJlvECunwXftkPwyvHbclArO8wszgBGisiLeuDFwNM8ws+wKIw0sv1os3ClWZOcrEB2eRXULYUsm8OVRGJKwGA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>Movie Ticket Booking</title>
+    <style>
+        /* Global Reset & Theme */
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Main Container Card */
+        .container {
+            background-color: #1e293b;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        /* Movie Selection Wrapper */
+        .movie-selector {
+            margin-bottom: 25px;
+        }
+
+        .movie-selector label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            background-color: #334155;
+            color: #fff;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            outline: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        select:focus {
+            border-color: #3b82f6;
+        }
+
+        /* Legend / Status Indicators */
+        .legend {
+            display: flex;
+            justify-content: space-between;
+            background: #0f172a;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Status Colors mapping to your JS classes */
+        .available { color: #10b981; }  /* Emerald Green */
+        .reserved-el { color: #3b82f6; } /* Royal Blue */
+        .booked-el { color: #ef4444; }   /* Vibrant Red */
+
+        /* Cinema Screen Visualizer */
+        .screen {
+            height: 8px;
+            background: #e2e8f0;
+            width: 80%;
+            margin: 0 auto 35px auto;
+            border-radius: 50%;
+            box-shadow: 0 10px 20px rgba(255, 255, 255, 0.15);
+        }
+
+        /* Grid Layout (Kept your exact classes) */
+        .parent { 
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 10px;
+            justify-items: center;
+            margin-bottom: 25px;
+        }
+
+        /* Seat Styling (Targeting your JS generation classes) */
+        .seat { 
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            transition: transform 0.1s ease;
+        }
+
+        .seat:hover {
+            transform: scale(1.2);
+        }
+
+        .seat i {
+            font-size: 26px;
+            color: #64748b; /* Default Grey for available */
+            transition: color 0.2s;
+        }
+
+        /* Seat States matching JS classes */
+        .seat.reserved i { 
+            color: #3b82f6 !important; 
+        }
+
+        .seat.booked i { 
+            color: #ef4444 !important; 
+        }
+
+        /* Summary / Cost Footer */
+        .total-wrapper {
+            border-top: 1px solid #334155;
+            padding-top: 20px;
+            text-align: center;
+        }
+
+        .total-wrapper h1 {
+            font-size: 20px;
+            font-weight: 500;
+            color: #94a3b8;
+        }
+
+        .total-cost {
+            color: #f59e0b; /* Amber Amber color for cost */
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        /* Hidden or unused elements from original markup kept for script safety */
+        .child { display: none; } 
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Movie Dropdown Section -->
+        <div class="movie-selector">
+            <label>Pick a movie:</label>
+            <select name="" id=""> 
+                <option value="10">Air wolf - $10 </option> 
+                <option value="15">Terminator Two - $15</option> 
+                <option value="20">Sultan - $20</option> 
+            </select>
+        </div>
+
+        <!-- Dashboard / Status Counter section -->
+        <div class="legend">
+            <div class="legend-item">
+                <i class="ri-sofa-fill available"></i> Available (<span class="available"></span>)
+            </div>
+            <div class="legend-item">
+                <i class="ri-sofa-fill reserved-el"></i> Reserved (<span class="reserved-el"></span>)
+            </div>
+            <div class="legend-item">
+                <i class="ri-sofa-fill booked-el"></i> Selected (<span class="booked-el"></span>)
+            </div>
+        </div>
+
+        <!-- Cinema Screen Curve -->
+        <div class="screen"></div>
+
+        <!-- Seating Grid Area -->
+        <div class="parent"> 
+            <h1 class="child"></h1> 
+        </div>
+
+        <!-- Total Price Footer -->
+        <div class="total-wrapper">
+            <h1>Total Cost: <span class="total-cost">$0</span></h1>
+        </div>
+    </div>
+
+    <!-- JavaScript block remains untouched -->
+    <script>
+        let parent = document.querySelector('.parent')
+        let available = document.querySelector('.available')
+        let reserved = document.querySelector('.reserved-el')
+        let booked = document.querySelector('.booked-el')
+        let totalCostEl = document.querySelector('.total-cost')
+        let selectMovie = document.querySelector('select')
+
+        let selectedIndexes = JSON.parse(localStorage.getItem('selectedIndexes')) || [];
+
+        selectMovie.addEventListener('change', function () {
+            console.log(selectMovie.value);
+            let bookedSeats = document.querySelectorAll('.booked')
+            let totalCost = bookedSeats.length * selectMovie.value
+            totalCostEl.textContent = totalCost
+        })
+
+        for (i = 1; i <= 40; i++) {
+            if (i == 5 || i == 9 || i == 12 || i == 35) {
+                parent.innerHTML += `<button class="reserved seat"> <i class="ri-sofa-fill"></i></button>`
+            } else {
+                parent.innerHTML += `<button class="seat"><i class="ri-sofa-fill"></i></button> `
+            }
+        }
+
+        let allSeats = document.querySelectorAll('.seat')
+        console.log(selectedIndexes);
+
+        if (selectedIndexes.length > 0) {
+            selectedIndexes.forEach((ele, idx) => {
+                allSeats[ele].classList.add('booked')
+            })
+        }
+        updateCount()
+
+        console.log(allSeats)
+        let show1 = document.querySelectorAll('.reserved')
+        console.log(show1.length)
+        console.log(allSeats.length - show1.length)
+        available.textContent = allSeats.length - show1.length
+        reserved.textContent = show1.length
+
+        function updateCount() {
+            let bookedSeats = document.querySelectorAll('.booked')
+            let reservedSeats = document.querySelectorAll('.reserved')
+            let allSeats = document.querySelectorAll('.seat')
+            console.log(bookedSeats);
+            booked.textContent = bookedSeats.length
+            available.textContent = (allSeats.length - reservedSeats.length) - bookedSeats.length
+            // let bookedSeats = document.querySelectorAll('.booked')
+            let totalCost = bookedSeats.length * selectMovie.value
+            totalCostEl.textContent = totalCost
+        }
+
+        parent.addEventListener('click', (e) => {
+            console.log(e.target);
+            let clicked;
+            if (e.target.classList.contains('ri-sofa-fill')) {
+                clicked = e.target.parentElement
+            } else if (e.target.classList.contains('seat')) {
+                clicked = e.target
+            }
+
+            if (clicked) {
+                if (clicked.classList.contains('reserved')) {
+                    alert('reserved')
+                } else if (clicked.classList.contains('booked')) {
+                    clicked.classList.remove('booked')
+                    let allSeats = document.querySelectorAll('.seat')
+                    allSeats = [...allSeats]
+                    let index = allSeats.indexOf(clicked)
+                    selectedIndexes = selectedIndexes.filter((ele, idx) => {
+                        return ele !== index
+                    })
+                    localStorage.setItem('selectedIndexes', JSON.stringify(selectedIndexes))
+                    updateCount()
+                } else {
+                    let allSeats = document.querySelectorAll('.seat')
+                    allSeats = [...allSeats]
+                    let index = allSeats.indexOf(clicked)
+                    console.log(index);
+                    selectedIndexes.push(index)
+                    localStorage.setItem('selectedIndexes', JSON.stringify(selectedIndexes))
+                    clicked.classList.add('booked')
+                    updateCount()
+                }
+            }
+        })
+    </script>
+</body>
+</html>
